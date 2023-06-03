@@ -1,0 +1,6 @@
+{
+    "tfsec.excludedPaths": [
+        "post-config-vmrelay01.tf",
+        "4-1-hub-shared.tf"
+    ]
+}

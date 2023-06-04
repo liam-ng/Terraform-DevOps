@@ -1,14 +1,6 @@
 #Multi-stage YAML pipeline demo.
 name: $(BuildDefinitionName).$(DayOfYear)$(Rev:.r)
 
-schedules:
-  - cron: "45 6 * * 4"
-    branches:
-      include:
-        - master
-    displayName: Weekly Thursday 6h45 am UTC build
-    always: true
-
 variables:
   - group: terraform_binary
   - name: vmImageName
@@ -16,14 +8,18 @@ variables:
   - name: secret_json # secret id located in your Azure DevOps library, file used by the following cmdlet Terraform init, plan, apply and destroy
     value: "main.json"
   - name: artifact_name
-    value: "AzureDevops-Introduction"
+    value: "landing_zone"
+  - name: "path"
+    value: "./landing_zone/" #folder path containing .tf 
+  - name: "package_name"
+    value: "landing_zone" # folder name
 
 resources:
   repositories:
-    - repository: Terraform-DevOps # identifier (A-Z, a-z, 0-9, and underscore)
+    - repository: Yaml_Templates # identifier (A-Z, a-z, 0-9, and underscore)
       type: git #git refers to Azure Repos Git repos
-      name: landing-zone #To refer to a repo in another project within the same organization, prefix the name with that project's name. For example, OtherProject/otherRepo.
-      #ref: refs/tags/0.1.0 # ref name to use, defaults to 'refs/heads/master'
+      name: template_pipeline #To refer to a repo in another project within the same organization, prefix the name with that project's name. For example, OtherProject/otherRepo.
+      ref: refs/tags/0.1.0 # ref name to use, defaults to 'refs/heads/master'
 
 trigger:
   batch: true # when a build is running, the system waits until the build is completed
@@ -34,7 +30,7 @@ trigger:
       - release/*
   paths:
     include:
-      - AzureDevops-Introduction/*
+      - landing_zone/*
 
 stages:
   - stage: Build
@@ -53,14 +49,14 @@ stages:
           - template: terraform.yml@Yaml_Templates
             parameters:
               version: $(terraform_version)
-              path: "./AzureDevops-Introduction/aks-k8s/"
-              package_name: "aks-k8s"
+              path: $(path)
+              package_name: $(package_name)
               terraform_init: true
               terraform_plan: true
-              backend_secret_file_id: $(secret_json)
-              backend_file_path: "variable/backend-jdld.tfvars"
-              main_secret_file_id: $(secret_json)
-              main_file_path: "variable/main-jdld.tfvars"
+              #backend_secret_file_id: $(secret_json)
+              #backend_file_path: "variable/backend-jdld.tfvars"
+              #main_secret_file_id: $(secret_json)
+              #main_file_path: "variable/main-jdld.tfvars"
 
           - publish: "./ArtifactPublishLocation" # Local path to include in the Artifact
             artifact: "$(artifact_name)"
@@ -83,9 +79,9 @@ stages:
                   parameters:
                     version: $(terraform_version)
                     artifact_path: $(Pipeline.Workspace)/$(artifact_name)
-                    package_name: "aks-k8s"
+                    package_name: $(package_name)
                     terraform_apply: true
-                    main_file_path: "variable/main-jdld.tfvars"
+                    #main_file_path: "variable/main-jdld.tfvars"
 
   - stage: Deliver
     dependsOn: Deploy
@@ -110,7 +106,7 @@ stages:
                   parameters:
                     version: $(terraform_version)
                     artifact_path: $(Pipeline.Workspace)/$(artifact_name)
-                    package_name: "aks-k8s"
+                    package_name: $(package_name)
                     terraform_destroy: true
                     main_secret_file_id: $(secret_json)
-                    main_file_path: "variable/main-jdld.tfvars"
+                    #main_file_path: "variable/main-jdld.tfvars"

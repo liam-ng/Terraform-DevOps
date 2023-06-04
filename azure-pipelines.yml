@@ -53,10 +53,10 @@ stages:
               package_name: $(package_name)
               terraform_init: true
               terraform_plan: true
-              #backend_secret_file_id: $(secret_json)
-              #backend_file_path: "variable/backend-jdld.tfvars"
-              #main_secret_file_id: $(secret_json)
-              #main_file_path: "variable/main-jdld.tfvars"
+              backend_secret_file_id: $(secret_json)
+              backend_file_path: "variable/backend.tfvars"
+              main_secret_file_id: $(secret_json)
+              main_file_path: "variable/main.tfvars"
 
           - publish: "./ArtifactPublishLocation" # Local path to include in the Artifact
             artifact: "$(artifact_name)"
@@ -81,7 +81,7 @@ stages:
                     artifact_path: $(Pipeline.Workspace)/$(artifact_name)
                     package_name: $(package_name)
                     terraform_apply: true
-                    #main_file_path: "variable/main-jdld.tfvars"
+                    main_file_path: "variable/main.tfvars"
 
   - stage: Deliver
     dependsOn: Deploy
@@ -109,4 +109,4 @@ stages:
                     package_name: $(package_name)
                     terraform_destroy: true
                     main_secret_file_id: $(secret_json)
-                    #main_file_path: "variable/main-jdld.tfvars"
+                    main_file_path: "variable/maindld.tfvars"

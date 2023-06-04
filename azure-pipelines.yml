@@ -22,7 +22,7 @@ resources:
   repositories:
     - repository: Terraform-DevOps # identifier (A-Z, a-z, 0-9, and underscore)
       type: git #git refers to Azure Repos Git repos
-      name: landing-zone #To refer to a repo in another project within the same organization, prefix the name with that project's name. For example, OtherProject/otherRepo.
+      name: landing_zone #To refer to a repo in another project within the same organization, prefix the name with that project's name. For example, OtherProject/otherRepo.
       #ref: refs/tags/0.1.0 # ref name to use, defaults to 'refs/heads/master'
 
 trigger:

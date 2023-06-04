@@ -1,14 +1,6 @@
 #Multi-stage YAML pipeline demo.
 name: $(BuildDefinitionName).$(DayOfYear)$(Rev:.r)
 
-schedules:
-  - cron: "45 6 * * 4"
-    branches:
-      include:
-        - master
-    displayName: Weekly Thursday 6h45 am UTC build
-    always: true
-
 variables:
   - group: terraform_binary
   - name: vmImageName
@@ -16,15 +8,14 @@ variables:
   - name: secret_json # secret id located in your Azure DevOps library, file used by the following cmdlet Terraform init, plan, apply and destroy
     value: "main.json"
   - name: artifact_name
-    value: "main"
+    value: "AzureDevops-Introduction"
 
 resources:
   repositories:
-    - repository: Terraform-DevOps # identifier (A-Z, a-z, 0-9, and underscore)
-      type: github #git refers to Azure Repos Git repos
-      endpoint: liam-ng
-      name: liam-ng/Terraform-DevOps #To refer to a repo in another project within the same organization, prefix the name with that project's name. For example, OtherProject/otherRepo.
-      #ref: refs/tags/0.1.0 # ref name to use, defaults to 'refs/heads/master'
+    - repository: Yaml_Templates # identifier (A-Z, a-z, 0-9, and underscore)
+      type: git #git refers to Azure Repos Git repos
+      name: template_pipeline #To refer to a repo in another project within the same organization, prefix the name with that project's name. For example, OtherProject/otherRepo.
+      ref: refs/tags/0.1.0 # ref name to use, defaults to 'refs/heads/master'
 
 trigger:
   batch: true # when a build is running, the system waits until the build is completed
@@ -35,7 +26,7 @@ trigger:
       - release/*
   paths:
     include:
-      - landing_zone/*
+      - AzureDevops-Introduction/*
 
 stages:
   - stage: Build

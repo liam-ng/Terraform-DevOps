@@ -16,13 +16,14 @@ variables:
   - name: secret_json # secret id located in your Azure DevOps library, file used by the following cmdlet Terraform init, plan, apply and destroy
     value: "main.json"
   - name: artifact_name
-    value: "AzureDevops-Introduction"
+    value: "main"
 
 resources:
   repositories:
     - repository: Terraform-DevOps # identifier (A-Z, a-z, 0-9, and underscore)
-      type: git #git refers to Azure Repos Git repos
-      name: landing_zone #To refer to a repo in another project within the same organization, prefix the name with that project's name. For example, OtherProject/otherRepo.
+      type: github #git refers to Azure Repos Git repos
+      endpoint: liam-ng
+      name: liam-ng/Terraform-DevOps #To refer to a repo in another project within the same organization, prefix the name with that project's name. For example, OtherProject/otherRepo.
       #ref: refs/tags/0.1.0 # ref name to use, defaults to 'refs/heads/master'
 
 trigger:
@@ -34,7 +35,7 @@ trigger:
       - release/*
   paths:
     include:
-      - AzureDevops-Introduction/*
+      - landing_zone/*
 
 stages:
   - stage: Build

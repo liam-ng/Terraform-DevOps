@@ -1,4 +1,3 @@
-#Ref https://github.com/JamesDLD/terraform/blob/master/AzureDevops-Introduction/azure-pipelines.yml
 #Multi-stage YAML pipeline demo.
 name: $(BuildDefinitionName).$(DayOfYear)$(Rev:.r)
 
@@ -11,21 +10,20 @@ schedules:
     always: true
 
 variables:
-  - name: terraform_version
-    value: "0.12.13"
+  - group: terraform_binary
   - name: vmImageName
     value: "ubuntu-latest"
-  - name: backend_main_secret_file_id1 # secret id located in your Azure DevOps library, file used by the following cmdlet Terraform init, plan, apply and destroy
-    value: "backend-main-jdld-1.json"
+  - name: secret_json # secret id located in your Azure DevOps library, file used by the following cmdlet Terraform init, plan, apply and destroy
+    value: "main.json"
   - name: artifact_name
     value: "AzureDevops-Introduction"
 
 resources:
   repositories:
-    - repository: Yaml_Templates # identifier (A-Z, a-z, 0-9, and underscore)
+    - repository: Terraform-DevOps # identifier (A-Z, a-z, 0-9, and underscore)
       type: git #git refers to Azure Repos Git repos
-      name: Template/template_pipeline #To refer to a repo in another project within the same organization, prefix the name with that project's name. For example, OtherProject/otherRepo.
-      ref: refs/tags/0.1.0 # ref name to use, defaults to 'refs/heads/master'
+      name: landing-zone #To refer to a repo in another project within the same organization, prefix the name with that project's name. For example, OtherProject/otherRepo.
+      #ref: refs/tags/0.1.0 # ref name to use, defaults to 'refs/heads/master'
 
 trigger:
   batch: true # when a build is running, the system waits until the build is completed
@@ -48,9 +46,9 @@ stages:
           vmImage: $(vmImageName)
         steps:
           - task: DownloadSecureFile@1
-            displayName: "Download secure file $(backend_main_secret_file_id1)"
+            displayName: "Download secure file $(secret_json)"
             inputs:
-              secureFile: $(backend_main_secret_file_id1)
+              secureFile: $(secret_json)
 
           - template: terraform.yml@Yaml_Templates
             parameters:
@@ -59,9 +57,9 @@ stages:
               package_name: "aks-k8s"
               terraform_init: true
               terraform_plan: true
-              backend_secret_file_id: $(backend_main_secret_file_id1)
+              backend_secret_file_id: $(secret_json)
               backend_file_path: "variable/backend-jdld.tfvars"
-              main_secret_file_id: $(backend_main_secret_file_id1)
+              main_secret_file_id: $(secret_json)
               main_file_path: "variable/main-jdld.tfvars"
 
           - publish: "./ArtifactPublishLocation" # Local path to include in the Artifact
@@ -104,9 +102,9 @@ stages:
             deploy:
               steps:
                 - task: DownloadSecureFile@1
-                  displayName: Download secure file $(backend_main_secret_file_id1)
+                  displayName: Download secure file $(secret_json)
                   inputs:
-                    secureFile: $(backend_main_secret_file_id1)
+                    secureFile: $(secret_json)
 
                 - template: terraform.yml@Yaml_Templates
                   parameters:
@@ -114,5 +112,5 @@ stages:
                     artifact_path: $(Pipeline.Workspace)/$(artifact_name)
                     package_name: "aks-k8s"
                     terraform_destroy: true
-                    main_secret_file_id: $(backend_main_secret_file_id1)
+                    main_secret_file_id: $(secret_json)
                     main_file_path: "variable/main-jdld.tfvars"

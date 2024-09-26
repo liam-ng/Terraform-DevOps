@@ -1,0 +1,77 @@
+uat_tm = {
+    "elogin" ={
+        name = "talontest001",
+        routing_method = "Weighted", 
+        status = "Enabled", 
+        ttl = 60,
+        protocol = "HTTPS", 
+        port = 443, 
+        path = "/",
+        expected_status_code_ranges = ["200-202", "301-302"],
+
+        external_endpoints = {
+          "endpoint1" = {
+            name      = "HV-01"
+            target    = "elogin001.hkjccom.com"
+            ratio     = 80
+            priority  = 1
+          },
+          "endpoint2" = {
+            name      = "ST-01"
+            target    = "elogin002.hkjccom.com"
+            ratio     = 20
+            priority  = 2
+          }
+      }
+      },
+    "elogin-football" ={
+        name = "talontest002",
+        routing_method = "Weighted", 
+        status = "Enabled", 
+        ttl = 60,
+        protocol = "HTTPS", 
+        port = 443 , 
+        path = "/",
+        expected_status_code_ranges = ["200-202", "301-302"],
+    
+        external_endpoints = {
+          "endpoint1" = {
+            name      = "HV-01"
+            target    = "elogin001.hkjccom.com"
+            ratio     = 70
+            priority  = 1
+          },
+          "endpoint2" = {
+            name      = "ST-01"
+            target    = "gtm.talontest004.com"
+            ratio     = 30
+            priority  = 2
+          }
+      }
+    },
+    "elogin-marksix"={
+        name = "talontest003",
+        routing_method = "Weighted", 
+        status = "Enabled", 
+        ttl = 60,
+        protocol = "HTTPS", 
+        port = 443 , 
+        path = "/",
+        expected_status_code_ranges = ["200-202", "301-302"],
+
+        external_endpoints = {
+          "endpoint1" = {
+            name      = "HV-01"
+            target    = "gtm.talontest005.com"
+            ratio     = 60
+            priority  = 1
+          },
+          "endpoint2" = {
+            name      = "ST-01"
+            target    = "gtm.talontest006.com"
+            ratio     = 40
+            priority  = 2
+          }
+      }
+    },
+}
